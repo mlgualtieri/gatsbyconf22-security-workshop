@@ -3,16 +3,13 @@ import * as jwt from "jsonwebtoken"
 
 const crypto = require('crypto');
 
-export default function handler(req,res) {
+export default async function handler(req,res) {
     console.log(`login form`, req.body)
 
 	try 
         {
-            // JWT valid for 4 hours (14400 seconds)
-            //const jwtExpirySeconds = 60*60*4
-            // 10 mins
+            // JWT valid for 10 mins (600 seconds)
             const jwtExpirySeconds = 60*10
-            //const jwtKey = "my_jwt_signing_key"
             const jwtKey = `${process.env.JWT_SECRET_KEY}`
 
             // Initialize vars
@@ -23,8 +20,90 @@ export default function handler(req,res) {
 
 
             // Log in to database and check credentials
+
+            const db  = require('../services/mysql');
+            let conn = await db.doConnect()
+
+            // This has an SQL injection
+            var query = `SELECT * FROM users WHERE username='${req.body.username}'`
+            let user  = await db.doQuery(conn, query)
+            user = user[0]
+            console.log(user)
+
+            // Check if valid login
+            var password = require('../services/password');
+            let login_result = await password.same(req.body.password, user.password)
+
+            if(login_result === true) {
+                console.log("Good login")
+
+                // Create and set CSRF token for our user
+                var csrf_token = crypto.randomBytes(64).toString('base64')
+	            console.log(`CSRF token: ${csrf_token}`)
+                query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
+                await db.doQuery(conn, query)
+
+                // Complete the login process
+                user_id     = user.id
+                username    = user.username
+                is_loggedin = 1
+
+                // Log in by creating a JWT
+		        const token = jwt.sign(
+		        	{ 
+                        user_id:  user_id, 
+                        username: username,
+                    },
+                    jwtKey, 
+                    { 
+                        algorithm: "HS256",
+                        expiresIn: jwtExpirySeconds,
+                    }
+    	        )
+
+	            console.log(`token: ${token}`)
+
+                // set cookie expiration and security headers
+                res.cookie("token", token, { 
+                    secure: true, 
+                    sameSite: 'none', 
+                    maxAge: 1000 * jwtExpirySeconds })
+                res.cookie("csrf_token", csrf_token, { 
+                    secure: true, 
+                    sameSite: 'none', 
+                    maxAge: 1000 * jwtExpirySeconds })
+
+                login_response.error    = 0
+                login_response.user_id  = user_id
+                login_response.msg      = `Login OK - You are logged in as: ${user_id} ${username}`
+            }
+            else {
+                login_response.error = 1
+                login_response.msg   = "Invalid login"
+                res.clearCookie("token")
+                res.clearCookie("csrf_token")
+            }
+
+            // send response
+            console.log(login_response.msg)
+            res.json(login_response)
+  	    } 
+    catch (err) 
+        {
+    	    console.log(err);
+  	    }
+}
+
+
+
+
+// OLD2
+/*
+            // Log in to database and check credentials
             const fs = require('fs');
 	        var mysql = require('mysql2');
+
+
 	        var connection = mysql.createConnection({
 	          host     : `${process.env.AWS_RDS_HOST}`,
 	          user     : `${process.env.AWS_RDS_ROOT}`,
@@ -35,6 +114,7 @@ export default function handler(req,res) {
                 ca: fs.readFileSync("./rds-ca-2019-root.pem").toString()
               }
 	        });
+
 
 	        connection.connect(function(err) {
 	            if (err) {
@@ -122,12 +202,13 @@ export default function handler(req,res) {
                     })
                 })
 	        })
-  	    } 
-    catch (err) 
-        {
-    	    console.log(err);
-  	    }
-}
+
+*/
+
+
+
+
+
 
 
 
