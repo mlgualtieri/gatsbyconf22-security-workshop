@@ -12,6 +12,8 @@ export default function handler(req,res) {
     const fs = require('fs');
 	var mysql = require('mysql2');
 
+
+
 	var connection = mysql.createConnection({
 	  host     : `${process.env.AWS_RDS_HOST}`,
 	  user     : `${process.env.AWS_RDS_ROOT}`,
@@ -59,7 +61,7 @@ export default function handler(req,res) {
                 CREATE TABLE users
                 (id int(11) unsigned primary key auto_increment not null,
                 username VARCHAR(64),
-                password VARCHAR(64),
+                password VARCHAR(512),
                 csrf_token VARCHAR(64));
             `)
 
@@ -77,9 +79,14 @@ export default function handler(req,res) {
             `)
 
 
-            // NEED: add password hashing
-            doQuery(connection, `INSERT INTO users (id,username,password) VALUES(1000,'user@test.com', 'my_secret_password')`)
-            doQuery(connection, `SELECT * FROM users`)
+
+            var password = require('../services/password');
+            password.hash('my_secret_password')
+            .then(pbkdf2_hash => {
+                doQuery(connection, `INSERT INTO users (id,username,password) VALUES(1000,'user@test.com', '${pbkdf2_hash}')`)
+                doQuery(connection, `SELECT * FROM users`)
+            })
+
 
             doQuery(connection, `INSERT INTO documents (id,filename) VALUES(1,'file1.txt')`)
             doQuery(connection, `INSERT INTO documents (id,filename) VALUES(2,'file2.txt')`)
@@ -89,7 +96,7 @@ export default function handler(req,res) {
             doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,2)`)
             doQuery(connection, `SELECT * FROM userdocs`)
 
-	        connection.end();
+	        //connection.end();
 	    });
 
 	});
@@ -112,4 +119,8 @@ export const doQuery = (con, query) => {
 	return result
   });
 }
+
+
+
+
 

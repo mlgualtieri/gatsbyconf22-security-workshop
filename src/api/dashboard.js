@@ -94,11 +94,14 @@ export default function handler(req,res) {
 // In the real world, the CSRF token should be generated randomly 
 // during user login and registered in a database
 function checkValidCSRFToken(csrf_token) {
+    return true
+    /*
     console.log(`CSRF Token:`, csrf_token)
     if(csrf_token == "abc-123-random-stuff-here") {
         console.log(`CSRF Token valid!`)
         return true
     }
     return false
+    */
 }
 

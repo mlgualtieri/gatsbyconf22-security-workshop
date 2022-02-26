@@ -1,6 +1,8 @@
 // npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
 
+const crypto = require('crypto');
+
 export default function handler(req,res) {
     console.log(`login form`, req.body)
 
@@ -20,6 +22,118 @@ export default function handler(req,res) {
             let login_response = {}
 
 
+            // Log in to database and check credentials
+            const fs = require('fs');
+	        var mysql = require('mysql2');
+	        var connection = mysql.createConnection({
+	          host     : `${process.env.AWS_RDS_HOST}`,
+	          user     : `${process.env.AWS_RDS_ROOT}`,
+	          password : `${process.env.AWS_RDS_ROOT_PASS}`,
+	          port     : 3306,
+              database : "securitydemo",
+              ssl: {
+                ca: fs.readFileSync("./rds-ca-2019-root.pem").toString()
+              }
+	        });
+
+	        connection.connect(function(err) {
+	            if (err) {
+	                console.error('Database connection failed: ' + err.stack);
+	                return;
+	            }
+	        
+	            console.log('Connected to database.');
+
+                var query = `SELECT * FROM users WHERE username='${req.body.username}'`
+                connection.query(query, function (err, user) {
+                    if (err) {
+                      console.log(err)
+                    }
+                    user = user[0]
+                    console.log(user)
+
+
+                    // Check if valid login
+                    var password = require('../services/password');
+                    password.same(req.body.password, user.password)
+                    .then(login_result => {
+
+                        if(login_result === true) {
+                            console.log("Good login")
+
+                            // Create and set CSRF token for our user
+                            var csrf_token = crypto.randomBytes(64).toString('base64')
+	                        console.log(`CSRF token: ${csrf_token}`)
+                            query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
+                            connection.query(query, function (err, result) {
+                                if (err) {
+                                  console.log(err)
+                                }
+
+                                // Complete the login process
+                                user_id     = user.id
+                                username    = user.username
+                                is_loggedin = 1
+
+                                // Log in by creating a JWT
+		                        const token = jwt.sign(
+		                        	{ 
+                                        user_id:  user_id, 
+                                        username: username,
+                                    },
+                                    jwtKey, 
+                                    { 
+                                        algorithm: "HS256",
+                                        expiresIn: jwtExpirySeconds,
+                                    }
+    	                        )
+
+	                            console.log(`token: ${token}`)
+
+                                // set cookie expiration and security headers
+                                res.cookie("token", token, { 
+                                    secure: true, 
+                                    sameSite: 'none', 
+                                    maxAge: 1000 * jwtExpirySeconds })
+                                res.cookie("csrf_token", csrf_token, { 
+                                    secure: true, 
+                                    sameSite: 'none', 
+                                    maxAge: 1000 * jwtExpirySeconds })
+
+                                login_response.error    = 0
+                                login_response.user_id  = user_id
+                                login_response.msg      = `Login OK - You are logged in as: ${user_id} ${username}`
+
+                                // send response
+                                console.log(login_response.msg)
+                                res.json(login_response)
+                            })
+                        }
+                        else {
+                            login_response.error = 1
+                            login_response.msg   = "Invalid login"
+                            res.clearCookie("token")
+                            res.clearCookie("csrf_token")
+
+                            // send response
+                            console.log(login_response.msg)
+                            res.json(login_response)
+                        }
+                    })
+                })
+	        })
+  	    } 
+    catch (err) 
+        {
+    	    console.log(err);
+  	    }
+}
+
+
+
+
+// old
+/*
             // NEED
             // Hardcoding default user login for now
             // Replace this with database driven calls
@@ -30,6 +144,7 @@ export default function handler(req,res) {
                     username    = "user@test.com"
                     is_loggedin = 1
                 }
+
             else if( (req.body.username == "admin@test.com") && 
                 (req.body.password == "super_secret_password"))
                 {
@@ -37,6 +152,7 @@ export default function handler(req,res) {
                     username    = "admin@test.com"
                     is_loggedin = 1
                 }
+
 
 
             // Check if valid login
@@ -82,11 +198,5 @@ export default function handler(req,res) {
 
             console.log(login_response.msg)
             res.json(login_response)
-
-  	    } 
-    catch (err) 
-        {
-    	    console.log(err);
-  	    }
-}
+*/
 
