@@ -1,0 +1,19 @@
+html, body, form, div, span, label, a {
+    font-family: 'Mulish', sans-serif;
+    #font-family: 'Droid Sans Mono' !important;
+    #font-family: 'Droid Sans Mono',"Courier New",monospace !important;
+}
+
+#login-form {
+  padding:20px;
+  margin:20px;
+  border:1px #999 solid;
+}
+#login-form input {
+  width:100%;
+  margin-top:10px;
+  margin-bottom:10px;
+}
+.error {
+    color:red;
+}
