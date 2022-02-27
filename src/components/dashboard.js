@@ -32,7 +32,7 @@ export const getFile = (file) => {
 
 export const getFile = (file, e) => {
 	e.preventDefault()
-	window.location.href = `/api/docs?file=${file}`
+    window.open(`/api/docs?file=${file}`, "_blank")
 }
 
 

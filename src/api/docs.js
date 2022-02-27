@@ -28,62 +28,6 @@ export default function handler(req,res) {
 	});
 
 
-
-    // RDS IAM signer
-	var signer = new AWS.RDS.Signer({
-	  // configure options
-	  region: `${process.env.AWS_RDS_REGION}`,
-	  username: 'default',
-	  hostname: `${process.env.AWS_RDS_HOST}`,
-	  port: 3306
-	});
-	signer.getAuthToken({
-	  username: `${process.env.AWS_RDS_IAM_USER}` // overriding username
-	}, function(err, token) {
-	  if (err) {
-	    // handle error
-		console.log(err)
-	  } else {
-	    // use token
-		console.log(token)
-
-
-        // RDS connect
-	    var mysql = require('mysql2');
-	    var connection = mysql.createConnection({
-	      host     : `${process.env.AWS_RDS_HOST}`,
-	      port     : 3306,
-          ssl      : 'Amazon RDS',
-          user     : `${process.env.AWS_RDS_IAM_USER}`,
-          authPlugins: {
-	      	mysql_clear_password: () => () =>
-            	signer.getAuthToken({
-	  				region: `${process.env.AWS_RDS_REGION}`,
-	  				hostname: `${process.env.AWS_RDS_HOST}`,
-	  				username: `${process.env.AWS_RDS_IAM_USER}`,
-	  				port: 3306
-            	})
-          }
-	    });
-	    
-	    connection.connect(function(err) {
-	      if (err) {
-	        console.error('Database connection failed: ' + err.stack);
-	        return;
-	      }
-	    
-	      console.log('Connected to database.');
-	    });
-	    
-	    connection.end();
-	  }
-	});
-
-
-
-
-
-
 	// Get file on S3
 	// https://gatsbyconf22-security-demo.s3.us-east-2.amazonaws.com/file1.txt
 	let s3 = new AWS.S3({apiVersion: '2006-03-01'});
