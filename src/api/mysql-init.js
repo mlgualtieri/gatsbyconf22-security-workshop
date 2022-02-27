@@ -62,7 +62,7 @@ export default function handler(req,res) {
                 (id int(11) unsigned primary key auto_increment not null,
                 username VARCHAR(64),
                 password VARCHAR(512),
-                csrf_token VARCHAR(64));
+                csrf_token VARCHAR(512));
             `)
 
             doQuery(connection, `
@@ -90,6 +90,9 @@ export default function handler(req,res) {
 
             doQuery(connection, `INSERT INTO documents (id,filename) VALUES(1,'file1.txt')`)
             doQuery(connection, `INSERT INTO documents (id,filename) VALUES(2,'file2.txt')`)
+            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(3,'file3.txt')`)
+            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(4,'file4.txt')`)
+            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(5,'file5.txt')`)
             doQuery(connection, `SELECT * FROM documents`)
 
             doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,1)`)

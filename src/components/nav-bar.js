@@ -1,6 +1,6 @@
 import React from "react"
 import { Link } from "gatsby"
-import { getUser, isLoggedIn } from "../services/auth"
+import { isLoggedIn } from "../services/auth"
 export default function NavBar() {
   let greetingMessage = ""
   if (isLoggedIn()) {

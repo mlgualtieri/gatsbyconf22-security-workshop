@@ -18,9 +18,9 @@ export async function doConnect() {
 }
 
 
-export async function doQuery(conn, query) {
+export async function doQuery(conn, query, params) {
     const mysql = require('mysql2/promise');
-    let [rows, fields] = await conn.execute(query)
+    let [rows, fields] = await conn.execute(query, params)
     return rows
 }
 
