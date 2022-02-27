@@ -4,7 +4,7 @@ import { getUser, isLoggedIn } from "../services/auth"
 export default function NavBar() {
   let greetingMessage = ""
   if (isLoggedIn()) {
-    greetingMessage = `Hello ${getUser().name}`
+    greetingMessage = `Welcome back!`
   } else {
     greetingMessage = "You are not logged in"
   }
