@@ -3,9 +3,7 @@ import Helmet from "react-helmet"
 import "../styles/global.css"
 
 
-import { 
-    //Link, 
-    useStaticQuery, graphql } from 'gatsby'
+import { useStaticQuery, graphql } from 'gatsby'
 import NavBar from "./nav-bar"
 
 import {
