@@ -10,7 +10,7 @@ const LogoutPage = () => {
   logout()
 
   return (
-    <>
+    <> // TODO: low priority - add notification component - tell user we are logging out
     </>
   )
 }
