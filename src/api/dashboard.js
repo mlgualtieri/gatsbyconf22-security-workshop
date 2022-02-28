@@ -1,7 +1,7 @@
 //npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
 
-export default async function handler(req,res) {
+export default async function handler(req, res) {
     console.log(`dashboard api req`, req.body)
 
     // Good practice to set Access-Control-Allow-Origin header
@@ -32,7 +32,7 @@ export default async function handler(req,res) {
 
 
     // Test for CSRF token before execution
-    let csrf_check = await checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
+    const csrf_check = await checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
     if(csrf_check === false)
     {
         // unauthorized
@@ -78,10 +78,10 @@ export default async function handler(req,res) {
 // Check for valid CSRF token attached to user
 async function checkValidCSRFToken(user_id, csrf_token) {
     const db  = require('../services/mysql');
-    let conn = await db.doConnect()
+    const conn = await db.doConnect()
 
-    var query = `SELECT * FROM users WHERE id=?`
-    let user  = await db.doQuery(conn, query, [user_id])
+    const query = `SELECT * FROM users WHERE id=?`
+    const user  = await db.doQuery(conn, query, [user_id])
     user = user[0]
 	conn.end();
 
