@@ -10,11 +10,11 @@ export default function handler(req,res) {
 
 	//var AWS = require("aws-sdk");
     const fs = require('fs');
-	var mysql = require('mysql2');
+	const mysql = require('mysql2');
 
 
 
-	var connection = mysql.createConnection({
+	const connection = mysql.createConnection({
 	  host     : `${process.env.AWS_RDS_HOST}`,
 	  user     : `${process.env.AWS_RDS_ROOT}`,
 	  password : `${process.env.AWS_RDS_ROOT_PASS}`,
@@ -80,7 +80,7 @@ export default function handler(req,res) {
 
 
 
-            var password = require('../services/password');
+            const password = require('../services/password');
             password.hash('my_secret_password')
             .then(pbkdf2_hash => {
                 doQuery(connection, `INSERT INTO users (id,username,password) VALUES(1000,'user@test.com', '${pbkdf2_hash}')`)
