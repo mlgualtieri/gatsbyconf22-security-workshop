@@ -24,15 +24,41 @@ export default async function handler(req,res) {
             const db  = require('../services/mysql');
             let conn = await db.doConnect()
 
-            // This has an SQL injection
-            var query = `SELECT * FROM users WHERE username='${req.body.username}'`
-            let user  = await db.doQuery(conn, query)
+
+            ////////////
+            // Proper way to check authentication
+            // Comment this code block to try the SQL injection below
+            var query = `SELECT * FROM users WHERE username=?`
+            let user  = await db.doQuery(conn, query, [req.body.username])
             user = user[0]
             console.log(user)
 
             // Check if valid login
             var password = require('../services/password');
             let login_result = await password.same(req.body.password, user.password)
+            ////////////
+            
+
+            /*
+            ////////////
+            // Bad authentication with SQL injection
+            // Comment the above codeblock and uncomment this to try the SQL injection
+            let login_result = false
+            var password = require('../services/password');
+            var password_hash = await password.hash(req.body.password)
+
+            var query = `SELECT * FROM users WHERE username='${req.body.username}' AND password='${password_hash}'`
+            console.log(query)
+            let user  = await db.doQuery(conn, query)
+            user = user[0]
+            console.log(user)
+
+            if(user !== false) {
+                login_result = true
+            }
+            ////////////
+            */
+
 
             if(login_result === true) {
                 console.log("Good login")
@@ -40,8 +66,9 @@ export default async function handler(req,res) {
                 // Create and set CSRF token for our user
                 var csrf_token = crypto.randomBytes(64).toString('base64')
 	            console.log(`CSRF token: ${csrf_token}`)
-                query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
-                await db.doQuery(conn, query)
+                //query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
+                query = `UPDATE users SET csrf_token=? WHERE username=?`
+                await db.doQuery(conn, query, [csrf_token, req.body.username])
 
                 // Complete the login process
                 user_id     = user.id
