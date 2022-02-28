@@ -40,7 +40,13 @@ export const setProfileData = (data) => {
     // Populate user data
     document.getElementById("fullname").innerText = data.fullname
     document.getElementById("username").innerText = data.username
-    
+    /*
+    	TODO: Replace with react logic
+	- track fullname and username using useState/ use Reducer
+	- pass in data into a list component
+	- separate logic and rendering - conditionally render if list is available
+	
+    */
     // Populate list of docs
     const doc_items = data.docs.map((file, e) =>  
         <li key={file}>
@@ -69,7 +75,7 @@ export const getData = data => {
             setProfileData(cachedData)
         }
         else {
-            // Show spinner while we wait for the data
+            // Show spinner while we wait for the data // TODO: create component for spinner and render spinning when getting data
             document.getElementById("fullname").innerHTML = `<i class="fas fa-spinner fa-spin"></i>`
             document.getElementById("username").innerHTML = `<i class="fas fa-spinner fa-spin"></i>` 
             document.getElementById("docs").innerHTML     = `<i class="fas fa-spinner fa-spin"></i>` 
@@ -85,7 +91,7 @@ export const getData = data => {
         })
         .then(response => {
             if(response.status !== 200) {
-                window.location.href = "/app/login"
+                window.location.href = "/app/login" // TODO: use navigate here
                 return null
             }
             else {
@@ -96,7 +102,7 @@ export const getData = data => {
             if(resultData !== null) {
                 //console.log(resultData)
                 setProfileData(resultData)
-                window.localStorage.setItem("dataCache", JSON.stringify(resultData))
+                window.localStorage.setItem("dataCache", JSON.stringify(resultData)) // local storage calls are expensive
             }
         }) 
     }
