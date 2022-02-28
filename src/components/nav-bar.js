@@ -3,7 +3,7 @@ import { Link } from "gatsby"
 import { isLoggedIn } from "../services/auth"
 export default function NavBar() {
   let greetingMessage = ""
-  if (isLoggedIn()) {
+  if (isLoggedIn()) { // TODO: Use React.useState hook for logged in message
     greetingMessage = `Welcome back!`
   } else {
     greetingMessage = "You are not logged in"
@@ -11,7 +11,7 @@ export default function NavBar() {
   return (
     <div
       style={{
-        display: "flex",
+        display: "flex", // TODO: extract css here to css module and import
         flex: "1",
         justifyContent: "space-between",
         borderBottom: "1px solid #d1c1e0",
@@ -21,7 +21,7 @@ export default function NavBar() {
       <nav>
         <Link to="/"><i className="fa fa-home"></i> home</Link>
         {` `}
-        {!isLoggedIn() ? (
+        {!isLoggedIn() ? ( // TODO: use one ternary to dictate which flow is used here
             <>
               <Link to="/about"><i className="far fa-address-card"></i> about</Link>
               {` `}
