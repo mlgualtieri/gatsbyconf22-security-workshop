@@ -1,6 +1,6 @@
 // npm install universal-cookie
-import { navigate } from "gatsby"
 import Cookies from "universal-cookie"
+import { navigate } from "gatsby"
 
 export const isBrowser = () => typeof window !== "undefined"
 
