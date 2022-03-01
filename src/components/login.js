@@ -1,18 +1,21 @@
-import { navigate } from "gatsby"
-import * as React from "react"
+import * as React from 'react'
 import { useForm } from "react-hook-form"
 import { handleLogin, isLoggedIn } from "../services/auth"
 
+
 const LoginPage = () => {
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm()
 
+
   if (isLoggedIn()) {
-    navigate(`/app/dashboard`)
+    window.location.href = `/app/dashboard`
   }
+
 
   const onSubmit = data => {
     handleLogin(data)
@@ -20,9 +23,13 @@ const LoginPage = () => {
 
   console.log({ errors })
 
+
   return (
     <>
-      <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        id="login-form"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <label htmlFor="first-name">Username</label>
         <input
           id="username"
@@ -39,14 +46,13 @@ const LoginPage = () => {
           {...register("password", { required: true, maxLength: 100 })}
         />
 
-        <h5 id="error" className="error">
-          {" "}
-        </h5>
+        <h5 id="error" className="error"> </h5>
 
         <input type="submit" value="Login" />
       </form>
     </>
   )
 }
+
 
 export default LoginPage
