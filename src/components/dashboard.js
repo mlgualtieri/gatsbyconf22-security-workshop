@@ -2,8 +2,6 @@ import * as React from "react"
 import { isLoggedIn } from "../services/auth"
 import { Link, navigate } from "gatsby"
 
-const ReactDOM = require("react-dom")
-
 //import Cookies from 'universal-cookie';
 
 export const getCachedData = () =>
