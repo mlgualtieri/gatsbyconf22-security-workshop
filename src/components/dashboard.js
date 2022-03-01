@@ -45,17 +45,17 @@ export const setProfileData = data => {
 	
     */
   // Populate list of docs
-  const doc_items = data.docs.map((file, e) => (
-    <li key={file}>
-      <Link to="#" onClick={e => getFile(file, e)}>
-        <i className="fa fa-file"></i> {file}
-      </Link>
-    </li>
-  ))
-  ReactDOM.render(<ul>{doc_items}</ul>, document.getElementById("docs"))
+  //   const doc_items = data.docs.map((file, e) => (
+  // <li key={file}>
+  //   <Link to="#" onClick={e => getFile(file, e)}>
+  //     <i className="fa fa-file"></i> {file}
+  //   </Link>
+  // </li>
+  //   ))
+  //   ReactDOM.render(<ul>{doc_items}</ul>, document.getElementById("docs"))
 }
 
-export const getData = data => {
+export const getData = async callback => {
   let postData = {}
 
   //const cookies = new Cookies();
@@ -63,20 +63,17 @@ export const getData = data => {
 
   if (isLoggedIn()) {
     // If cached data is present retrieve
-    let cachedData = getCachedData()
+    let cachedData = await getCachedData()
     if (Object.keys(cachedData).length !== 0) {
-      setProfileData(cachedData)
+      //   await setProfileData(cachedData)
+      callback(cachedData)
     } else {
-      // Show spinner while we wait for the data // TODO: create component for spinner and render spinning when getting data
-      document.getElementById(
-        "fullname"
-      ).innerHTML = `<i class="fas fa-spinner fa-spin"></i>`
-      document.getElementById(
-        "username"
-      ).innerHTML = `<i class="fas fa-spinner fa-spin"></i>`
-      document.getElementById(
-        "docs"
-      ).innerHTML = `<i class="fas fa-spinner fa-spin"></i>`
+      const loadingSpinner = <i class="fas fa-spinner fa-spin"></i>
+      callback({
+        username: loadingSpinner,
+        fullname: loadingSpinner,
+        docs: loadingSpinner,
+      })
     }
 
     // Update with the dashboard server-side data
@@ -98,7 +95,8 @@ export const getData = data => {
       .then(resultData => {
         if (resultData !== null) {
           //console.log(resultData)
-          setProfileData(resultData)
+          callback(resultData)
+
           window.localStorage.setItem("dataCache", JSON.stringify(resultData)) // local storage calls are expensive
         }
       })
@@ -106,10 +104,25 @@ export const getData = data => {
     console.log("Not logged in...")
   }
 }
-
+const UlWrapper = ({ children }) => <ul>{children}</ul>
 const Dashboard = () => {
+  const [username, setUsername] = React.useState(``)
+  const [fullname, setFullname] = React.useState(``)
+  const [docs, setDocs] = React.useState([])
   React.useEffect(() => {
-    getData()
+    getData(data => {
+      if (data.username) {
+        setUsername(data.username)
+      }
+
+      if (data.fullname) {
+        setFullname(data.fullname)
+      }
+
+      if (data.docs) {
+        setDocs(data.docs)
+      }
+    })
   }, [])
 
   return (
@@ -117,14 +130,30 @@ const Dashboard = () => {
       <h2>Account</h2>
       <ul>
         <li>
-          <b>Name:</b> <span id="fullname"></span>
+          <b>Name:</b> <span id="fullname">{fullname}</span>
         </li>
         <li>
-          <b>Email:</b> <span id="username"></span>
+          <b>Email:</b> <span id="username">{username}</span>
         </li>
       </ul>
       <h2>Documents</h2>
-      <div id="docs"></div>
+      <div id="docs">
+        {!Array.isArray(docs) ? (
+          docs
+        ) : docs.length > 0 ? (
+          <UlWrapper>
+            {docs.map((file, index) => {
+              return (
+                <li key={file}>
+                  <Link to="#" onClick={e => getFile(file, e)}>
+                    <i className="fa fa-file"></i> {file}
+                  </Link>
+                </li>
+              )
+            })}
+          </UlWrapper>
+        ) : null}
+      </div>
     </>
   )
 }

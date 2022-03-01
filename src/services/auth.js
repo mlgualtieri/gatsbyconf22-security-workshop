@@ -13,7 +13,8 @@ export const getUser = () =>
 //  window.localStorage.setItem("gatsbyUser", JSON.stringify(user))
 
 //export const handleLogin = ({ username, password }) => {
-export const handleLogin = data => {
+export const handleLogin = async data => {
+  console.log({ inputData: data })
   fetch(`/api/login`, {
     method: `POST`,
     body: JSON.stringify(data),
@@ -28,7 +29,7 @@ export const handleLogin = data => {
       if (body.error === 1) {
         document.getElementById("error").innerText = body.msg
       } else {
-        window.location.href = `/app/dashboard`
+        navigate(`/app/dashboard`)
       }
     })
     .catch(error => {
