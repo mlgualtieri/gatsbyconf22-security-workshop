@@ -1,45 +1,55 @@
 // npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
 
-const crypto = require('crypto');
+const crypto = require("crypto")
 
-export default async function handler(req,res) {
-    console.log(`login form`, req.body)
+export default async function handler(req, res) {
+  console.log(`login form`, req.body)
+  try {
+    // JWT valid for 10 mins (600 seconds)
+    const jwtExpirySeconds = 60 * 10
+    const jwtKey = `${process.env.JWT_SECRET_KEY}`
 
-	try 
-        {
-            // JWT valid for 10 mins (600 seconds)
-            const jwtExpirySeconds = 60*10
-            const jwtKey = `${process.env.JWT_SECRET_KEY}`
+    // Initialize vars
+    let userId = 0
+    let username = ""
+    let isLoggedIn = ""
+    let loginResponse = {}
 
-            // Initialize vars
-            let user_id     = 0
-            let username    = ""
-            let is_loggedin = ""
-            let login_response = {}
+    // Log in to database and check credentials
 
+    const db = require("../services/mysql")
+    let conn = await db.doConnect()
 
-            // Log in to database and check credentials
+    ////////////
+    // Proper way to check authentication
+    // Comment this code block to try the SQL injection below
+    const query = `SELECT * FROM users WHERE username=?`
+    let user
+    try {
+      const userFound = await db.doQuery(conn, query, [req.body.username])
+      user = userFound && userFound[0]
+    } catch (error) {
+      throw new Error(`user cannot be found: ` + error.message)
+    }
+    console.log(user)
 
-            const db  = require('../services/mysql');
-            let conn = await db.doConnect()
+    // Check if valid login
+    const password = require("../services/password")
 
+    let loginResult
+    try {
+      loginResult = await password.same(req.body.password, user.password)
+    } catch (error) {
+      const loginResponse = {}
+      loginResponse.error = 1
+      loginResponse.msg = "user not found"
 
-            ////////////
-            // Proper way to check authentication
-            // Comment this code block to try the SQL injection below
-            var query = `SELECT * FROM users WHERE username=?`
-            let user  = await db.doQuery(conn, query, [req.body.username])
-            user = user[0]
-            console.log(user)
+      return res.json(loginResponse)
+    }
+    ////////////
 
-            // Check if valid login
-            var password = require('../services/password');
-            let login_result = await password.same(req.body.password, user.password)
-            ////////////
-            
-
-            /*
+    /*
             ////////////
             // Bad authentication with SQL injection
             // Comment the above codeblock and uncomment this to try the SQL injection
@@ -59,72 +69,67 @@ export default async function handler(req,res) {
             ////////////
             */
 
+    if (loginResult === true) {
+      console.log("Good login")
 
-            if(login_result === true) {
-                console.log("Good login")
+      // Create and set CSRF token for our user
+      const csrf_token = crypto.randomBytes(64).toString("base64")
+      console.log(`CSRF token: ${csrf_token}`)
+      //query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
+      //query = `UPDATE users SET csrf_token=? WHERE username=?`
+      //await db.doQuery(conn, query, [csrf_token, req.body.username])
+      const query = `UPDATE users SET csrf_token=? WHERE id=?`
+      await db.doQuery(conn, query, [csrf_token, user.id])
 
-                // Create and set CSRF token for our user
-                var csrf_token = crypto.randomBytes(64).toString('base64')
-	            console.log(`CSRF token: ${csrf_token}`)
-                //query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
-                //query = `UPDATE users SET csrf_token=? WHERE username=?`
-                //await db.doQuery(conn, query, [csrf_token, req.body.username])
-                query = `UPDATE users SET csrf_token=? WHERE id=?`
-                await db.doQuery(conn, query, [csrf_token, user.id])
+      // Complete the login process
+      userId = user.id
+      username = user.username
+      isLoggedIn = 1
 
-                // Complete the login process
-                user_id     = user.id
-                username    = user.username
-                is_loggedin = 1
-
-                // Log in by creating a JWT
-		        const token = jwt.sign(
-		        	{ 
-                        user_id:  user_id, 
-                        username: username,
-                    },
-                    jwtKey, 
-                    { 
-                        algorithm: "HS256",
-                        expiresIn: jwtExpirySeconds,
-                    }
-    	        )
-
-	            console.log(`token: ${token}`)
-
-                // set cookie expiration and security headers
-                res.cookie("token", token, { 
-                    secure: true, 
-                    sameSite: 'none', 
-                    maxAge: 1000 * jwtExpirySeconds })
-                res.cookie("csrf_token", csrf_token, { 
-                    secure: true, 
-                    sameSite: 'none', 
-                    maxAge: 1000 * jwtExpirySeconds })
-
-                login_response.error    = 0
-                login_response.user_id  = user_id
-                login_response.msg      = `Login OK - You are logged in as: ${user_id} ${username}`
-            }
-            else {
-                login_response.error = 1
-                login_response.msg   = "Invalid login"
-                res.clearCookie("token")
-                res.clearCookie("csrf_token")
-            }
-
-            // send response
-            console.log(login_response.msg)
-            res.json(login_response)
-  	    } 
-    catch (err) 
+      // Log in by creating a JWT
+      const token = jwt.sign(
         {
-    	    console.log(err);
-  	    }
+          userId: userId,
+          username: username,
+        },
+        jwtKey,
+        {
+          algorithm: "HS256",
+          expiresIn: jwtExpirySeconds,
+        }
+      )
+
+      console.log(`token: ${token}`)
+
+      // set cookie expiration and security headers
+      res.cookie("token", token, {
+        secure: true,
+        sameSite: "none",
+        maxAge: 1000 * jwtExpirySeconds,
+      })
+      res.cookie("csrf_token", csrf_token, {
+        secure: true,
+        sameSite: "none",
+        maxAge: 1000 * jwtExpirySeconds,
+      })
+
+      loginResponse.error = 0
+      loginResponse.userId = userId
+      loginResponse.msg = `Login OK - You are logged in as: ${userId} ${username}`
+    } else {
+      loginResponse.error = 1
+      loginResponse.msg = "Invalid login"
+      res.clearCookie("token")
+      res.clearCookie("csrf_token")
+    }
+
+    // send response
+    console.log(loginResponse.msg)
+    res.json(loginResponse)
+  } catch (err) {
+    console.log(err)
+  }
 }
-
-
-
 
 // OLD2
 /*
@@ -180,14 +185,14 @@ export default async function handler(req,res) {
                                 }
 
                                 // Complete the login process
-                                user_id     = user.id
+                                userId     = user.id
                                 username    = user.username
-                                is_loggedin = 1
+                                isLoggedIn = 1
 
                                 // Log in by creating a JWT
 		                        const token = jwt.sign(
 		                        	{ 
-                                        user_id:  user_id, 
+                                        userId:  userId, 
                                         username: username,
                                     },
                                     jwtKey, 
@@ -209,38 +214,30 @@ export default async function handler(req,res) {
                                     sameSite: 'none', 
                                     maxAge: 1000 * jwtExpirySeconds })
 
-                                login_response.error    = 0
-                                login_response.user_id  = user_id
-                                login_response.msg      = `Login OK - You are logged in as: ${user_id} ${username}`
+                                loginResponse.error    = 0
+                                loginResponse.userId  = userId
+                                loginResponse.msg      = `Login OK - You are logged in as: ${userId} ${username}`
 
                                 // send response
-                                console.log(login_response.msg)
-                                res.json(login_response)
+                                console.log(loginResponse.msg)
+                                res.json(loginResponse)
                             })
                         }
                         else {
-                            login_response.error = 1
-                            login_response.msg   = "Invalid login"
+                            loginResponse.error = 1
+                            loginResponse.msg   = "Invalid login"
                             res.clearCookie("token")
                             res.clearCookie("csrf_token")
 
                             // send response
-                            console.log(login_response.msg)
-                            res.json(login_response)
+                            console.log(loginResponse.msg)
+                            res.json(loginResponse)
                         }
                     })
                 })
 	        })
 
 */
-
-
-
-
-
-
-
-
 
 // old
 /*
@@ -250,30 +247,30 @@ export default async function handler(req,res) {
             if( (req.body.username == "user@test.com") && 
                 (req.body.password == "my_secret_password"))
                 {
-                    user_id     = 1000
+                    userId     = 1000
                     username    = "user@test.com"
-                    is_loggedin = 1
+                    isLoggedIn = 1
                 }
 
             else if( (req.body.username == "admin@test.com") && 
                 (req.body.password == "super_secret_password"))
                 {
-                    user_id     = 1
+                    userId     = 1
                     username    = "admin@test.com"
-                    is_loggedin = 1
+                    isLoggedIn = 1
                 }
 
 
 
             // Check if valid login
-            if(is_loggedin == 1)
+            if(isLoggedIn == 1)
             {
                 // Log in by creating a JWT
 		        const token = jwt.sign(
 		        	{ 
-                        user_id:  user_id, 
+                        userId:  userId, 
                         username: username,
-                        //is_loggedin: 1
+                        //isLoggedIn: 1
                     },
                     jwtKey, 
                     { 
@@ -295,18 +292,17 @@ export default async function handler(req,res) {
                     sameSite: 'none', 
                     maxAge: 1000 * jwtExpirySeconds })
 
-                login_response.error    = 0
-                login_response.user_id  = user_id
-                login_response.msg      = `Login OK - You are logged in as: ${user_id} ${username}`
+                loginResponse.error    = 0
+                loginResponse.userId  = userId
+                loginResponse.msg      = `Login OK - You are logged in as: ${userId} ${username}`
             }
             else
             {
-                login_response.error = 1
-                login_response.msg   = "Invalid login"
+                loginResponse.error = 1
+                loginResponse.msg   = "Invalid login"
                 res.clearCookie("token")
             }
 
-            console.log(login_response.msg)
-            res.json(login_response)
+            console.log(loginResponse.msg)
+            res.json(loginResponse)
 */
-

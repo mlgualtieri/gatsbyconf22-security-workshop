@@ -14,8 +14,7 @@ export const getUser = () =>
 
 //export const handleLogin = ({ username, password }) => {
 export const handleLogin = async data => {
-  console.log({ inputData: data })
-  fetch(`/api/login`, {
+  await fetch(`/api/login`, {
     method: `POST`,
     body: JSON.stringify(data),
     headers: {
@@ -27,13 +26,13 @@ export const handleLogin = async data => {
       console.log(`response from API:`, body)
 
       if (body.error === 1) {
-        document.getElementById("error").innerText = body.msg
+        throw new Error(body.msg)
       } else {
         navigate(`/app/dashboard`)
       }
     })
     .catch(error => {
-      document.getElementById("error").innerText = "Login error"
+      throw new Error(error.message)
     })
 
   /*

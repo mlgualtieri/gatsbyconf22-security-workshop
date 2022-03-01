@@ -1,6 +1,7 @@
 import { navigate } from "gatsby"
 import * as React from "react"
 import { useForm } from "react-hook-form"
+import { useNotification } from "../hooks/useNotificationHook"
 import { handleLogin, isLoggedIn } from "../services/auth"
 
 const LoginPage = () => {
@@ -10,12 +11,15 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm()
 
+  const { message, setMessage } = useNotification()
   if (isLoggedIn()) {
     navigate(`/app/dashboard`)
   }
 
   const onSubmit = data => {
-    handleLogin(data)
+    handleLogin(data).catch(error => {
+      setMessage(error.message)
+    })
   }
 
   console.log({ errors })
@@ -40,7 +44,7 @@ const LoginPage = () => {
         />
 
         <h5 id="error" className="error">
-          {" "}
+          {message}
         </h5>
 
         <input type="submit" value="Login" />
