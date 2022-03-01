@@ -2,15 +2,56 @@
 // npm install aws-sdk
 import * as jwt from "jsonwebtoken"
 
-export default function handler(req,res) {
+export default async function handler(req,res) {
     console.log(`docs api req`, req.body)
 
-    // NEED: Do auth here
+    // Good practice to set Access-Control-Allow-Origin header
+    res.setHeader(`Access-Control-Allow-Origin`, `https://127.0.0.1:8000`);
 
+
+
+    /*
+    // Authenticate JWT
+    let payload = {}
+	try {
+        const token = req.cookies.token
+        console.log(`Auth token:`, token)
+        const jwtKey = `${process.env.JWT_SECRET_KEY}`
+
+	    payload = jwt.verify(token, jwtKey, { algorithms: ["HS256", "RS256", "HS384"] })
+        console.log("JWT payload...")
+        console.log(payload)
+	} 
+    catch (err) {
+        if (err instanceof jwt.JsonWebTokenError) {
+            // unauthorized token
+			return res.status(401).end()
+		}
+
+		// bad request
+		return res.status(400).end()
+	}
+
+    // Test for CSRF token before execution
+    const csrf = require('../services/csrf');
+    const csrf_check = await csrf.checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
+    if(csrf_check === false)
+    {
+        // unauthorized
+		return res.status(401).end()
+    }
+    */
+
+
+    // JWT and CSRF tokens are valid... continue execution
+
+
+    // Retrieve doc from AWS S3 bucket
+
+	// Log in to AWS
 	var AWS = require("aws-sdk");
     const fs = require('fs');
 
-	// Log in to AWS
 	AWS.config.update({
 	  region: `${process.env.AWS_RDS_REGION}`,
 	  accessKeyId: `${process.env.AWS_ACCESS_KEY_ID}`,

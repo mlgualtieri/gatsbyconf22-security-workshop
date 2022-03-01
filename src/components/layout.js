@@ -9,6 +9,9 @@ import {
   heading,
 } from './layout.module.css'
 
+// Note:
+// Instead of using 'unsafe-inline' for style-src we could also use nonce 'sha256-cLHlYu9WwZQgD1K6YlWPqFYXJEuD9YpxdlDktBDedco='
+
 const Layout = ({ pageTitle, children }) => {
 
   const data = useStaticQuery(graphql`
@@ -20,10 +23,6 @@ const Layout = ({ pageTitle, children }) => {
       }
     }
   `)
-
-
-  // Note:
-  // Instead of using 'unsafe-inline' for style-src we could also use 'sha256-cLHlYu9WwZQgD1K6YlWPqFYXJEuD9YpxdlDktBDedco='
 
   let output = (
     <>

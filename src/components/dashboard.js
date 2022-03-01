@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { isLoggedIn } from "../services/auth"
-import { Link } from "gatsby"
+import { Link, navigate } from "gatsby"
 
 const ReactDOM = require('react-dom')
 
@@ -91,7 +91,7 @@ export const getData = data => {
         })
         .then(response => {
             if(response.status !== 200) {
-                window.location.href = "/app/login" // TODO: use navigate here
+                navigate("/app/logout")
                 return null
             }
             else {

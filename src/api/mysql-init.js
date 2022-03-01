@@ -1,129 +1,73 @@
-// npm install jsonwebtoken
 // npm install aws-sdk
-import * as jwt from "jsonwebtoken"
 
-
-export default function handler(req,res) {
+// To init database run:
+// curl http://127.0.0.1:8000/api/mysql-init
+export default async function handler(req,res) {
     console.log(`docs api req`, req.body)
 
-    // NEED: Do auth here
+    const db  = require('../services/mysql');
+    let connection = await db.doConnectForInit()
 
-	//var AWS = require("aws-sdk");
-    const fs = require('fs');
-	const mysql = require('mysql2');
+	console.log('Connected to database.');
 
+    await db.doQuery(connection, 'DROP DATABASE IF EXISTS securitydemo;')
+    await db.doQuery(connection, 'CREATE DATABASE securitydemo;')
 
+	connection.end();
 
-	const connection = mysql.createConnection({
-	  host     : `${process.env.AWS_RDS_HOST}`,
-	  user     : `${process.env.AWS_RDS_ROOT}`,
-	  password : `${process.env.AWS_RDS_ROOT_PASS}`,
-	  port     : 3306,
-      ssl: {
-        ca: fs.readFileSync("./rds-ca-2019-root.pem").toString()
-      }
-	});
+	console.log('Database initialized...');
 
 
-	connection.connect(function(err) {
-	    if (err) {
-	        console.error('Database connection failed: ' + err.stack);
-	        return;
-	    }
-	
-	    console.log('Connected to database.');
-
-        doQuery(connection, 'DROP DATABASE IF EXISTS securitydemo;')
-        doQuery(connection, 'CREATE DATABASE securitydemo;')
-	    connection.end();
-
-
-	    connection = mysql.createConnection({
-	      host     : `${process.env.AWS_RDS_HOST}`,
-	      user     : `${process.env.AWS_RDS_ROOT}`,
-	      password : `${process.env.AWS_RDS_ROOT_PASS}`,
-	      port     : 3306,
-          database : "securitydemo",
-          ssl: {
-            ca: fs.readFileSync("./rds-ca-2019-root.pem").toString()
-          }
-	    });
-
-	    connection.connect(function(err) {
-	        if (err) {
-	            console.error('Database connection failed: ' + err.stack);
-	            return;
-	        }
-	    
-	        console.log('Connected to database.');
-
-            doQuery(connection, `
-                CREATE TABLE users
-                (id int(11) unsigned primary key auto_increment not null,
-                username VARCHAR(64),
-                password VARCHAR(512),
-                csrf_token VARCHAR(512));
-            `)
-
-            doQuery(connection, `
-                CREATE TABLE documents
-                (id int(11) unsigned primary key auto_increment not null,
-                filename VARCHAR(64));
-            `)
-
-            doQuery(connection, `
-                CREATE TABLE userdocs
-                (id int(11) unsigned primary key auto_increment not null,
-                id_users int(11) unsigned,
-                id_documents int(11) unsigned);
-            `)
+    connection = await db.doConnect()
+	console.log('Connected to database.');
 
 
 
-            const password = require('../services/password');
-            password.hash('my_secret_password')
-            .then(pbkdf2_hash => {
-                doQuery(connection, `INSERT INTO users (id,username,password) VALUES(1000,'user@test.com', '${pbkdf2_hash}')`)
-                doQuery(connection, `SELECT * FROM users`)
-            })
+    await db.doQuery(connection, `
+        CREATE TABLE users
+        (id int(11) unsigned primary key auto_increment not null,
+        username VARCHAR(64),
+        fullname VARCHAR(64),
+        password VARCHAR(512),
+        csrf_token VARCHAR(512));
+    `)
+
+    await db.doQuery(connection, `
+        CREATE TABLE documents
+        (id int(11) unsigned primary key auto_increment not null,
+        filename VARCHAR(64));
+    `)
+
+    await db.doQuery(connection, `
+        CREATE TABLE userdocs
+        (id int(11) unsigned primary key auto_increment not null,
+        id_users int(11) unsigned,
+        id_documents int(11) unsigned);
+    `)
+
+    const password = require('../services/password');
+    var pbkdf2_hash = await password.hash("my_secret_password")
+    await db.doQuery(connection, `INSERT INTO users (id,username,fullname,password) VALUES(1000,'user@test.com', 'User Test', '${pbkdf2_hash}')`)
+    let users = await db.doQuery(connection, `SELECT * FROM users`)
+    console.log(users)
 
 
-            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(1,'file1.txt')`)
-            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(2,'file2.txt')`)
-            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(3,'file3.txt')`)
-            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(4,'file4.txt')`)
-            doQuery(connection, `INSERT INTO documents (id,filename) VALUES(5,'file5.txt')`)
-            doQuery(connection, `SELECT * FROM documents`)
+    await db.doQuery(connection, `INSERT INTO documents (id,filename) VALUES(1,'file1.txt')`)
+    await db.doQuery(connection, `INSERT INTO documents (id,filename) VALUES(2,'file2.txt')`)
+    await db.doQuery(connection, `INSERT INTO documents (id,filename) VALUES(3,'file3.txt')`)
+    await db.doQuery(connection, `INSERT INTO documents (id,filename) VALUES(4,'file4.txt')`)
+    await db.doQuery(connection, `INSERT INTO documents (id,filename) VALUES(5,'file5.txt')`)
+    let documents = await db.doQuery(connection, `SELECT * FROM documents`)
+    console.log(documents)
 
-            doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,1)`)
-            doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,2)`)
-            doQuery(connection, `SELECT * FROM userdocs`)
+    await db.doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,1)`)
+    await db.doQuery(connection, `INSERT INTO userdocs (id_users,id_documents) VALUES(1000,2)`)
+    let userdocs = await db.doQuery(connection, `SELECT * FROM userdocs`)
+    console.log(userdocs)
 
-	        //connection.end();
-	    });
-
-	});
-
+	connection.end();
 
     res.status(200).send("ok")
     return
 }
-
-
-
-
-
-export const doQuery = (con, query) => {
-  con.query(query, function (err, result) {
-    if (err) {
-        console.log(err)
-    }
-    console.log(result)
-	return result
-  });
-}
-
-
-
-
 

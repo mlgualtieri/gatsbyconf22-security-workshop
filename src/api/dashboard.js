@@ -8,8 +8,8 @@ export default async function handler(req, res) {
     res.setHeader(`Access-Control-Allow-Origin`, `https://127.0.0.1:8000`);
 
 
+    // Authenticate JWT
     let payload = {}
-
 	try {
         const token = req.cookies.token
         console.log(`Auth token:`, token)
@@ -30,39 +30,53 @@ export default async function handler(req, res) {
 	}
 
 
-
     // Test for CSRF token before execution
-    const csrf_check = await checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
+    const csrf = require('../services/csrf');
+    const csrf_check = await csrf.checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
     if(csrf_check === false)
     {
         // unauthorized
 		return res.status(401).end()
     }
 
+
     // JWT and CSRF tokens are valid... continue execution
 
 
-    // If we are here, the token is valid and we are logged in... but there's a flaw in our logic
 
+    // If we are here, the token is valid and we are logged in...
     try {
+        // initialize vars
         let user = {}
         user.user_id    = 0
         user.username   = ""
         user.fullname   = ""
+        user.docs = []
 
         // ensure we have valid json
         if (typeof req.body === 'string') {
             req.body = JSON.parse(req.body)
         }
         
-        // Instead of using a database, return static data
-        if(payload.user_id == 1000)
-        {
-            user.user_id    = 1000
-            user.username   = "user@test.com"
-            user.fullname   = "User Test"
-            user.docs       = ['file1.txt','file2.txt']
-        }
+        // retrieve user data from database
+        const db  = require('../services/mysql');
+        let conn = await db.doConnect()
+
+        // get user
+        var query = `SELECT * FROM users WHERE id=?`
+        let dbuser  = await db.doQuery(conn, query, [payload.user_id])
+        dbuser = dbuser[0]
+        user.user_id    = dbuser.id
+        user.username   = dbuser.username
+        user.fullname   = dbuser.fullname
+
+        // get user docs
+        query = `SELECT * FROM userdocs as ud LEFT JOIN documents as d ON d.id=ud.id_documents WHERE ud.id_users=?`
+        let docs  = await db.doQuery(conn, query, [payload.user_id])
+        //console.log(docs)
+
+        docs.forEach(doc => user.docs.push(doc.filename))
+
 
         console.log("Returning...")
         console.log(user)
@@ -75,23 +89,4 @@ export default async function handler(req, res) {
 }
 
 
-// Check for valid CSRF token attached to user
-async function checkValidCSRFToken(user_id, csrf_token) {
-    const db  = require('../services/mysql');
-    const conn = await db.doConnect()
-
-    const query = `SELECT * FROM users WHERE id=?`
-    const user  = await db.doQuery(conn, query, [user_id])
-    user = user[0]
-	conn.end();
-
-return true
-    if(user.csrf_token == csrf_token) {
-        console.log("CSRF token valid...")
-        return true
-    }
-
-    console.log("CSRF token not valid...")
-    return false
-}
 

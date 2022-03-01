@@ -9,8 +9,9 @@ const LogoutPage = () => {
   console.log("logout")
   logout()
 
+  // TODO: low priority - add notification component - tell user we are logging out
   return (
-    <> // TODO: low priority - add notification component - tell user we are logging out
+    <> 
     </>
   )
 }

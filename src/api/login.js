@@ -67,8 +67,10 @@ export default async function handler(req,res) {
                 var csrf_token = crypto.randomBytes(64).toString('base64')
 	            console.log(`CSRF token: ${csrf_token}`)
                 //query = `UPDATE users SET csrf_token='${csrf_token}' WHERE username='${req.body.username}'`
-                query = `UPDATE users SET csrf_token=? WHERE username=?`
-                await db.doQuery(conn, query, [csrf_token, req.body.username])
+                //query = `UPDATE users SET csrf_token=? WHERE username=?`
+                //await db.doQuery(conn, query, [csrf_token, req.body.username])
+                query = `UPDATE users SET csrf_token=? WHERE id=?`
+                await db.doQuery(conn, query, [csrf_token, user.id])
 
                 // Complete the login process
                 user_id     = user.id
