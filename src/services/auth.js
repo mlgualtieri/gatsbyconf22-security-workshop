@@ -14,6 +14,7 @@ export const getUser = () =>
 
 //export const handleLogin = ({ username, password }) => {
 export const handleLogin = async data => {
+
   await fetch(`/api/login`, {
     method: `POST`,
     body: JSON.stringify(data),
