@@ -31,29 +31,7 @@ export const getFile = (file, e) => {
   window.open(`/api/docs?file=${file}`, "_blank")
 }
 
-export const setProfileData = data => {
-  // Populate user data
-  document.getElementById("fullname").innerText = data.fullname
-  document.getElementById("username").innerText = data.username
-  /*
-    	TODO: Replace with react logic
-	- track fullname and username using useState/ use Reducer
-	- pass in data into a list component
-	- separate logic and rendering - conditionally render if list is available
-	
-    */
-  // Populate list of docs
-  //   const doc_items = data.docs.map((file, e) => (
-  // <li key={file}>
-  //   <Link to="#" onClick={e => getFile(file, e)}>
-  //     <i className="fa fa-file"></i> {file}
-  //   </Link>
-  // </li>
-  //   ))
-  //   ReactDOM.render(<ul>{doc_items}</ul>, document.getElementById("docs"))
-}
-
-export const getData = async callback => {
+export const getData = async frontEndCallback => {
   let postData = {}
 
   //const cookies = new Cookies();
@@ -63,11 +41,10 @@ export const getData = async callback => {
     // If cached data is present retrieve
     let cachedData = await getCachedData()
     if (Object.keys(cachedData).length !== 0) {
-      //   await setProfileData(cachedData)
-      callback(cachedData)
+      frontEndCallback(cachedData)
     } else {
       const loadingSpinner = <i class="fas fa-spinner fa-spin"></i>
-      callback({
+      frontEndCallback({
         username: loadingSpinner,
         fullname: loadingSpinner,
         docs: loadingSpinner,
@@ -93,7 +70,7 @@ export const getData = async callback => {
       .then(resultData => {
         if (resultData !== null) {
           //console.log(resultData)
-          callback(resultData)
+          frontEndCallback(resultData)
 
           window.localStorage.setItem("dataCache", JSON.stringify(resultData)) // local storage calls are expensive
         }
