@@ -1,4 +1,3 @@
-import { navigate } from "gatsby"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { useNotification } from "../hooks/useNotificationHook"
@@ -13,7 +12,7 @@ const LoginPage = () => {
 
   const { message, setMessage } = useNotification()
   if (isLoggedIn()) {
-    navigate(`/app/dashboard`)
+    window.location.href = `/app/dashboard`
   }
 
   const onSubmit = data => {

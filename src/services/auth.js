@@ -1,6 +1,5 @@
 // npm install universal-cookie
-import { navigate } from "gatsby"
-import Cookies from "universal-cookie"
+import Cookies from 'universal-cookie';
 
 export const isBrowser = () => typeof window !== "undefined"
 
@@ -9,10 +8,12 @@ export const getUser = () =>
     ? JSON.parse(window.localStorage.getItem("gatsbyUser"))
     : {}
 
+
 //const setUser = user =>
 //  window.localStorage.setItem("gatsbyUser", JSON.stringify(user))
 
 //export const handleLogin = ({ username, password }) => {
+<<<<<<< HEAD
 export const handleLogin = async data => {
   await fetch(`/api/login`, {
     method: `POST`,
@@ -33,7 +34,32 @@ export const handleLogin = async data => {
     })
     .catch(error => {
       throw new Error(error.message)
+=======
+export const handleLogin = data => {
+
+    fetch(`/api/login`, {
+      method: `POST`,
+      body: JSON.stringify(data),
+      headers: {
+        "content-type": `application/json`,
+      },
+>>>>>>> main
     })
+      .then(res => res.json())
+      .then(body => {
+        console.log(`response from API:`, body)
+
+        if(body.error === 1) {
+            document.getElementById("error").innerText = body.msg
+        }
+        else {
+		    window.location.href = `/app/dashboard`
+        }
+
+      })
+      .catch(error => { 
+            document.getElementById("error").innerText = "Login error"
+      })
 
   /*
   if (username === `user@test.com` && password === `my_secret_password`) {
@@ -48,12 +74,12 @@ export const handleLogin = async data => {
 }
 
 export const isLoggedIn = () => {
-  const cookies = new Cookies()
-  let token = cookies.get("token")
-  return !!token
+    const cookies = new Cookies();
+    let token = cookies.get('token')
+    return !!token
 
-  //const user = getUser()
-  //return !!user.username
+    //const user = getUser()
+    //return !!user.username
 }
 
 /*
@@ -63,21 +89,22 @@ export const logout = callback => {
 }
 */
 
-export const logout = async () => {
-  // remove cached data regardless of session status
-  window.localStorage.removeItem("dataCache")
+export const logout = () => {
+    // remove cached data regardless of session status
+    window.localStorage.removeItem("dataCache")
 
-  if (isLoggedIn()) {
-    // If logged in then logout via the backend API
-    console.log("logging out...")
-    try {
-      const result = await fetch(`/api/logout`)
-      navigate("/app/login")
-    } catch (error) {
-      console.log(`failed logout: `, error.message)
+    if (isLoggedIn()) {
+        // If logged in then logout via the backend API
+        console.log("logging out...")
+        fetch(`/api/logout`)
+        .then(() => window.location.href = "/app/login")
     }
-  } else {
-    // Make sure we always redirect on logout
-    navigate("/app/login")
-  }
+    else {
+        // Make sure we always redirect on logout
+        window.location.href = "/app/login"
+    }
 }
+
+
+
+
