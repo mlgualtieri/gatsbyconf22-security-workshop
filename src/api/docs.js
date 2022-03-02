@@ -10,6 +10,7 @@ export default async function handler(req,res) {
 
 
     /*
+    // Uncomment to fix broken authentication
     // Authenticate JWT
     let payload = {}
 	try {
@@ -34,8 +35,7 @@ export default async function handler(req,res) {
     // Test for CSRF token before execution
     const csrf = require('../services/csrf');
     const csrf_check = await csrf.checkValidCSRFToken(payload.userId, req.query.csrf_token)
-    if(csrf_check === false)
-    {
+    if(csrf_check === false) {
         // unauthorized
 		return res.status(401).end()
     }
@@ -43,6 +43,24 @@ export default async function handler(req,res) {
 
 
     // JWT and CSRF tokens are valid... continue execution
+
+
+    /*
+    // Ensure that user is allowed to retrieve the file to stop IDOR
+    const db = require("../services/mysql")
+    let conn = await db.doConnect()
+
+    let query = `SELECT * FROM userdocs as ud LEFT JOIN documents as d ON d.id=ud.id_documents WHERE ud.id_users=?`
+    let docs = await db.doQuery(conn, query, [payload.userId])
+    let _docs = []
+    _docs.push(...docs.map(({ filename }) => filename))
+    let doc_check = _docs.includes(req.query.file)
+    if(doc_check === false) {
+        // unauthorized
+		return res.status(401).end()
+    }
+    */
+
 
 
     // Retrieve doc from AWS S3 bucket
