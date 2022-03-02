@@ -6,7 +6,7 @@ export default async function handler(req,res) {
     console.log(`docs api req`, req.body)
 
     // Good practice to set Access-Control-Allow-Origin header
-    res.setHeader(`Access-Control-Allow-Origin`, `${process.env.Access-Control-Allow-Origin}`)
+    res.setHeader(`Access-Control-Allow-Origin`, `${process.env.ACCESS_CONTROL_ALLOW_ORIGIN}`)
 
 
     /*
