@@ -66,6 +66,7 @@ export default async function handler(req,res) {
     console.log(userdocs)
 
 	connection.end();
+    console.log("Done!")
 
     res.status(200).send("ok")
     return

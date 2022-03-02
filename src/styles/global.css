@@ -4,6 +4,9 @@ html, body, form, div, span, label, a, main, p {
     #font-family: 'Droid Sans Mono',"Courier New",monospace !important;
 }
 
+.img100 {
+    width:100%;
+}
 #login-form {
   padding:20px;
   margin:20px;

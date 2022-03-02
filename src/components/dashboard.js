@@ -1,6 +1,9 @@
+// npm install dompurify 
+
 import * as React from "react"
 import { isLoggedIn } from "../services/auth"
 import { Link, navigate } from "gatsby"
+import DOMPurify from 'dompurify'; 
 
 //import Cookies from 'universal-cookie';
 
@@ -28,6 +31,8 @@ export const getFile = (file) => {
 
 export const getFile = (file, e) => {
   e.preventDefault()
+  // Use DOMPurify here to prevent an XSS
+  file = DOMPurify.sanitize(file)
   window.open(`/api/docs?file=${file}`, "_blank")
 }
 

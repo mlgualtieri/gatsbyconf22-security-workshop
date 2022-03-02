@@ -1,20 +1,23 @@
 import * as React from 'react'
 import Layout from '../components/layout'
-import { StaticImage } from 'gatsby-plugin-image'
 import { Link } from "gatsby"
 import { getUser, isLoggedIn } from "../services/auth"
-
+import gatsbyLogo from '../images/Gatsby-Logo.svg'
 
 const IndexPage = () => {
   return (
-    <Layout pageTitle="Home Page">
-      <p>I'm making this by following the Gatsby Tutorial.</p>
-      <StaticImage
-        alt="Clifford, a reddish-brown pitbull, posing on a couch and looking stoically at the camera"
-        src="../images/clifford.webp"
-      />
+    <Layout pageTitle="Home">
+      <p>This is a website designed to securely share documents.  There may be some vulnerabilities in it though!</p>
+      <div>
+        <img
+          className="img100"
+          alt="GatsbyConf 2022 Security Demo"
+          src={gatsbyLogo}
+        />
+      </div>
 
-      <h1>Hello {isLoggedIn() ? getUser().name : "world"}!</h1>
+      <hr/>
+
       <p>
         {isLoggedIn() ? (
           <>
