@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   console.log(`dashboard api req`, req.body)
 
   // Good practice to set Access-Control-Allow-Origin header
-  res.setHeader(`Access-Control-Allow-Origin`, `https://127.0.0.1:8000`)
+  res.setHeader(`Access-Control-Allow-Origin`, `${process.env.Access-Control-Allow-Origin}`)
 
   // Authenticate JWT
   let payload = {}
