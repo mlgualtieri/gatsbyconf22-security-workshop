@@ -35,7 +35,7 @@ export const getData = async frontEndCallback => {
     if (Object.keys(cachedData).length !== 0) {
       frontEndCallback(cachedData)
     } else {
-      const loadingSpinner = <i class="fas fa-spinner fa-spin"></i>
+      const loadingSpinner = <i className="fas fa-spinner fa-spin"></i>
       frontEndCallback({
         username: loadingSpinner,
         fullname: loadingSpinner,
