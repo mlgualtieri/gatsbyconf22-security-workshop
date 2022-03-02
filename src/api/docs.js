@@ -59,6 +59,7 @@ export default async function handler(req,res) {
         // unauthorized
 		return res.status(401).end()
     }
+    conn.end()
     */
 
 

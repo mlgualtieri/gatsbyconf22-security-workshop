@@ -56,5 +56,7 @@ export default async function handler(req, res) {
   let query = `UPDATE users SET csrf_token=? WHERE id=?`
   await db.doQuery(conn, query, [req.cookies.csrf_token, payload.userId])
 
+  conn.end()
+
   res.json(`logout`)
 }

@@ -75,6 +75,8 @@ export default async function handler(req, res) {
     user.docs.push(...docs.map(({ filename }) => filename))
     // docs.forEach(doc => user.docs.push(doc.filename))
 
+    conn.end()
+
     console.log("Returning...")
     console.log(user)
     res.json(user)
