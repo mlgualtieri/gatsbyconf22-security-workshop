@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   const csrf = require("../services/csrf")
   const csrf_check = await csrf.checkValidCSRFToken(
     payload.userId,
-    req.cookies.csrf_token
+    req.body.csrf_token
   )
   if (csrf_check === false) {
     // unauthorized

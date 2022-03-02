@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Layout from '../components/layout'
 import { Link } from "gatsby"
-import { getUser, isLoggedIn } from "../services/auth"
+import { isLoggedIn } from "../services/auth"
 import gatsbyLogo from '../images/Gatsby-Logo.svg'
 
 const IndexPage = () => {

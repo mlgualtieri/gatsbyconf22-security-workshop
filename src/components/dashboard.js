@@ -4,43 +4,30 @@ import * as React from "react"
 import { isLoggedIn } from "../services/auth"
 import { Link, navigate } from "gatsby"
 import DOMPurify from 'dompurify'; 
-
-//import Cookies from 'universal-cookie';
+import Cookies from 'universal-cookie';
 
 export const getCachedData = () =>
   window.localStorage.getItem("dataCache")
     ? JSON.parse(window.localStorage.getItem("dataCache"))
     : {}
 
-/*
-export const getFile = (file) => {
-    console.log(file)
-    fetch(`/api/docs`, {
-        method: 'POST',
-        headers: {
-          "content-type": `application/json`,
-        },
-        body: JSON.stringify(file)
-    })
-    .then(response => response.blob())
-	.then(function(blob) {
-    	download(blob);
-  	});
-}
-*/
-
 export const getFile = (file, e) => {
   e.preventDefault()
+
   // Use DOMPurify here to prevent an XSS
   file = DOMPurify.sanitize(file)
-  window.open(`/api/docs?file=${file}`, "_blank")
+
+  const cookies = new Cookies();
+  let csrf_token = cookies.get('csrf_token')
+
+  window.open(`/api/docs?file=${file}&csrf_token=${csrf_token}`, "_blank")
 }
 
 export const getData = async frontEndCallback => {
   let postData = {}
 
-  //const cookies = new Cookies();
-  //postData.csrf_token = cookies.get('csrf_token')
+  const cookies = new Cookies();
+  postData.csrf_token = cookies.get('csrf_token')
 
   if (isLoggedIn()) {
     // If cached data is present retrieve

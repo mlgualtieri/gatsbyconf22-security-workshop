@@ -9,7 +9,6 @@ export default async function handler(req,res) {
     res.setHeader(`Access-Control-Allow-Origin`, `https://127.0.0.1:8000`);
 
 
-
     /*
     // Authenticate JWT
     let payload = {}
@@ -34,7 +33,7 @@ export default async function handler(req,res) {
 
     // Test for CSRF token before execution
     const csrf = require('../services/csrf');
-    const csrf_check = await csrf.checkValidCSRFToken(payload.user_id, req.cookies.csrf_token)
+    const csrf_check = await csrf.checkValidCSRFToken(payload.userId, req.query.csrf_token)
     if(csrf_check === false)
     {
         // unauthorized
