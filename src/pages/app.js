@@ -7,7 +7,8 @@ import Login from "../components/login"
 import Logout from "../components/logout"
 
 let title = "Dashboard"
-if(window.location.pathname === "/app/login") {
+const url = typeof window !== 'undefined' ? window.location.href : '';
+if(url === "/app/login") {
     title = "Login"
 } 
 
