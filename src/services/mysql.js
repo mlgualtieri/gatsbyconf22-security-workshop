@@ -1,8 +1,10 @@
+const mysql = require('mysql2/promise');
+const fs = require('fs');
 
 // Connect to AWS RDS database for init
 export async function doConnectForInit() {
-    const mysql = require('mysql2/promise');
-    const fs = require('fs');
+    //const mysql = require('mysql2/promise');
+    //const fs = require('fs');
 
 	var conn = await mysql.createConnection({
 	  host     : `${process.env.AWS_RDS_HOST}`,
@@ -20,8 +22,8 @@ export async function doConnectForInit() {
 
 // Connect to AWS RDS database
 export async function doConnect() {
-    const mysql = require('mysql2/promise');
-    const fs = require('fs');
+    //const mysql = require('mysql2/promise');
+    //const fs = require('fs');
 
 	var conn = await mysql.createConnection({
 	  host     : `${process.env.AWS_RDS_HOST}`,
@@ -42,7 +44,7 @@ export async function doConnect() {
 export async function doQuery(conn, query, params) {
     //console.log(query)
     //console.log(params)
-    const mysql = require('mysql2/promise');
+    //const mysql = require('mysql2/promise');
     let [rows, fields] = await conn.execute(query, params)
     return rows
 }

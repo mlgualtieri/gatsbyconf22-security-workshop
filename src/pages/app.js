@@ -6,14 +6,8 @@ import Dashboard from "../components/dashboard"
 import Login from "../components/login"
 import Logout from "../components/logout"
 
-let title = "Dashboard"
-let url = typeof window !== 'undefined' ? window.location.pathname : '';
-if(url === "/app/login") {
-    title = "Login"
-} 
-
 const App = () => (
-  <Layout pageTitle={title}>
+  <Layout>
     <Router basepath="/app">
       <PrivateRoute path="/dashboard" component={Dashboard} />
       <Login path="/login" />

@@ -8,7 +8,6 @@ export default async function handler(req,res) {
     // Good practice to set Access-Control-Allow-Origin header
     res.setHeader(`Access-Control-Allow-Origin`, `${process.env.ACCESS_CONTROL_ALLOW_ORIGIN}`)
 
-
     /*
     // Uncomment to fix broken authentication
     // Authenticate JWT
@@ -40,7 +39,6 @@ export default async function handler(req,res) {
 		return res.status(401).end()
     }
     */
-
 
     // JWT and CSRF tokens are valid... continue execution
 
