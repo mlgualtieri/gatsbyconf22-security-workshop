@@ -1,5 +1,7 @@
 //npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
+import * as db from "../services/mysql"
+import * as csrf from "../services/csrf"
 
 export default async function handler(req, res) {
   console.log(`dashboard api req`, req.body)
@@ -30,7 +32,6 @@ export default async function handler(req, res) {
   }
 
   // Test for CSRF token before execution
-  const csrf = require("../services/csrf")
   const csrf_check = await csrf.checkValidCSRFToken(
     payload.userId,
     req.body.csrf_token
@@ -57,7 +58,6 @@ export default async function handler(req, res) {
     }
 
     // retrieve user data from database
-    const db = require("../services/mysql")
     let conn = await db.doConnect()
 
     // get user

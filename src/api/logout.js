@@ -1,11 +1,16 @@
 // npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
+import * as db from "../services/mysql"
+import * as csrf from "../services/csrf"
 
 export default async function handler(req, res) {
   console.log(`logout`, req.body)
 
   // Good practice to set Access-Control-Allow-Origin header
-  res.setHeader(`Access-Control-Allow-Origin`, `${process.env.ACCESS_CONTROL_ALLOW_ORIGIN}`)
+  res.setHeader(
+    `Access-Control-Allow-Origin`,
+    `${process.env.ACCESS_CONTROL_ALLOW_ORIGIN}`
+  )
 
   // Save copies of client-side cookies
   let token = req.cookies.token
@@ -40,7 +45,6 @@ export default async function handler(req, res) {
   }
 
   // Test for CSRF token before execution
-  const csrf = require("../services/csrf")
   const csrf_check = await csrf.checkValidCSRFToken(
     payload.userId,
     req.cookies.csrf_token
@@ -51,10 +55,9 @@ export default async function handler(req, res) {
   }
 
   // Remove CSRF token from database to invalidate the server-side authentication
-  const db = require("../services/mysql")
   let conn = await db.doConnect()
   let query = `UPDATE users SET csrf_token=? WHERE id=?`
-  await db.doQuery(conn, query, ['', payload.userId])
+  await db.doQuery(conn, query, ["", payload.userId])
 
   conn.end()
 

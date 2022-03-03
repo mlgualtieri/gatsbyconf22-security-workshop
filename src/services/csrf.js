@@ -1,6 +1,6 @@
+import * as db from "../services/mysql"
 // Check for valid CSRF token attached to user
 export async function checkValidCSRFToken(userId, csrf_token) {
-  const db = require("../services/mysql")
   const conn = await db.doConnect()
 
   const query = `SELECT * FROM users WHERE id=?`
