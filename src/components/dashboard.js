@@ -20,7 +20,17 @@ export const getFile = (file, e) => {
   const cookies = new Cookies();
   let csrf_token = cookies.get('csrf_token')
 
-  window.open(`/api/docs?file=${file}&csrf_token=${csrf_token}`, "_blank")
+  // To prompt download we will append an a element to the DOM and simulate a click
+  let url = `/api/docs?file=${file}&csrf_token=${csrf_token}`
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute(
+    'download',
+    `${file}`,
+  );
+  document.body.appendChild(link);
+  link.click();
+  link.parentNode.removeChild(link);
 }
 
 export const getData = async frontEndCallback => {
