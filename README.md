@@ -3,52 +3,29 @@
     <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
   </a>
 </p>
-<h1 align="center">
-  Gatsby minimal starter
-</h1>
 
-## 🚀 Quick start
+## 🚀 Welcome GatsbyConf 2022 Visitors!
 
-1.  **Create a Gatsby site.**
+This demo web application has been created by @mlgualtieri and @rmatambo8 for the GatsbyConf 2022 workshop: **Building a Secure Gatsby Website**.  The demo is a small application designed to securely share documents. There may be some (purposful) vulnerabilities in it though!
 
-    Use the Gatsby CLI to create a new site, specifying the minimal starter.
+The workshop will cover the following topics:
+- Securely architecting a Gatsby web application
+- IAM basics
+- JWT authentication
+- Environment variables
+- Data caching and security
+- Securly logging out 
+- CSRF and XSS 
+- Can you hack Static? Using CSP and SRI 
+- Common web application vulnerability: Broken authentication
+- Common web application vulnerability: IDOR 
+- Common web application vulnerability: Injection
 
+
+## To try out the application run:
     ```shell
-    # create a new Gatsby site using the minimal starter
-    npm init gatsby
+    cd gatsbyconf22-security-workshop/
+    npm install
+    gatsby develop
     ```
-
-2.  **Start developing.**
-
-    Navigate into your new site’s directory and start it up.
-
-    ```shell
-    cd my-gatsby-site/
-    npm run develop
-    ```
-
-3.  **Open the code and start customizing!**
-
-    Your site is now running at http://localhost:8000!
-
-    Edit `src/pages/index.js` to see your site update in real-time!
-
-4.  **Learn more**
-
-    - [Documentation](https://www.gatsbyjs.com/docs/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-    - [Tutorials](https://www.gatsbyjs.com/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-    - [Guides](https://www.gatsbyjs.com/tutorial/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-    - [API Reference](https://www.gatsbyjs.com/docs/api-reference/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-    - [Plugin Library](https://www.gatsbyjs.com/plugins?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-    - [Cheat Sheet](https://www.gatsbyjs.com/docs/cheat-sheet/?utm_source=starter&utm_medium=readme&utm_campaign=minimal-starter)
-
-## 🚀 Quick start (Gatsby Cloud)
-
-Deploy this starter with one click on [Gatsby Cloud](https://www.gatsbyjs.com/cloud/):
-
-[<img src="https://www.gatsbyjs.com/deploynow.svg" alt="Deploy to Gatsby Cloud">](https://www.gatsbyjs.com/dashboard/deploynow?url=https://github.com/gatsbyjs/gatsby-starter-minimal)
+Note: For the application to be fully functional it requires an AWS RDS MySQL server and an AWS S3 bucket, accessible via an IAM user.
