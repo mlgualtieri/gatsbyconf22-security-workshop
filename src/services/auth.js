@@ -9,10 +9,6 @@ export const getUser = () =>
     ? JSON.parse(window.localStorage.getItem("gatsbyUser"))
     : {}
 
-//const setUser = user =>
-//  window.localStorage.setItem("gatsbyUser", JSON.stringify(user))
-
-//export const handleLogin = ({ username, password }) => {
 export const handleLogin = async data => {
 
   await fetch(`/api/login`, {
@@ -29,6 +25,12 @@ export const handleLogin = async data => {
       if (body.error === 1) {
         throw new Error(body.msg)
       } else {
+        // Put our CSRF token into local storage
+        // This is the value we will trust, and no longer use the cookie
+        const cookies = new Cookies();
+        window.localStorage.setItem("csrf_token", cookies.get('csrf_token'))
+
+        // redirect to dashboard
         navigate(`/app/dashboard`)
       }
     })
@@ -42,6 +44,13 @@ export const handleLogin = async data => {
       if (body.error === 1) {
         document.getElementById("error").innerText = body.msg
       } else {
+        // Put our CSRF token into local storage
+        // This is the value we will trust, and no longer use the cookie
+        const cookies = new Cookies();
+        window.localStorage.setItem("csrf_token", cookies.get('csrf_token'))
+        alert(cookies.get('csrf_token'))
+
+        // redirect to dashboard
         window.location.href = `/app/dashboard`
       }
     })
@@ -49,15 +58,6 @@ export const handleLogin = async data => {
       document.getElementById("error").innerText = "Login error"
     })
 
-  /*
-  if (username === `user@test.com` && password === `my_secret_password`) {
-    return setUser({
-      username: `tester`,
-      name: `tester`,
-      email: `user@test`,
-    })
-  }
-  */
   return false
 }
 
@@ -65,21 +65,13 @@ export const isLoggedIn = () => {
   const cookies = new Cookies()
   let token = cookies.get("token")
   return !!token
-
-  //const user = getUser()
-  //return !!user.username
 }
 
-/*
-export const logout = callback => {
-  setUser({})
-  callback()
-}
-*/
 
 export const logout = () => {
   // remove cached data regardless of session status
   window.localStorage.removeItem("dataCache")
+  window.localStorage.removeItem("csrf_token")
 
   if (isLoggedIn()) {
     // If logged in then logout via the backend API

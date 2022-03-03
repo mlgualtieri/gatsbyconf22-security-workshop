@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { useNotification } from "../hooks/useNotificationHook"
 import { handleLogin, isLoggedIn } from "../services/auth"
 
+
 const LoginPage = () => {
   const {
     register,
@@ -12,6 +13,7 @@ const LoginPage = () => {
 
   const { message, setMessage } = useNotification()
   if (isLoggedIn()) {
+    // Redirect to dashboard
     window.location.href = `/app/dashboard`
   }
 

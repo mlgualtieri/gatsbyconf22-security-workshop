@@ -4,7 +4,6 @@ import * as React from "react"
 import { isLoggedIn } from "../services/auth"
 import { Link, navigate } from "gatsby"
 import DOMPurify from 'dompurify'; 
-import Cookies from 'universal-cookie';
 
 export const getCachedData = () =>
   window.localStorage.getItem("dataCache")
@@ -17,8 +16,7 @@ export const getFile = (file, e) => {
   // Use DOMPurify here to prevent an XSS
   file = DOMPurify.sanitize(file)
 
-  const cookies = new Cookies();
-  let csrf_token = cookies.get('csrf_token')
+  let csrf_token = window.localStorage.getItem('csrf_token')
 
   // To prompt download we will append an a element to the DOM and simulate a click
   let url = `/api/docs?file=${file}&csrf_token=${csrf_token}`
@@ -36,8 +34,7 @@ export const getFile = (file, e) => {
 export const getData = async frontEndCallback => {
   let postData = {}
 
-  const cookies = new Cookies();
-  postData.csrf_token = cookies.get('csrf_token')
+  postData.csrf_token = window.localStorage.getItem('csrf_token')
 
   if (isLoggedIn()) {
     // If cached data is present retrieve
