@@ -14,7 +14,7 @@ The workshop will cover the following topics:
 - JWT authentication
 - Environment variables
 - Data caching and security
-- Securly logging out 
+- Securely logging out 
 - CSRF and XSS 
 - Can you hack Static? Using CSP and SRI 
 - Common web application vulnerability: Broken authentication
