@@ -54,7 +54,7 @@ export default async function handler(req, res) {
   const db = require("../services/mysql")
   let conn = await db.doConnect()
   let query = `UPDATE users SET csrf_token=? WHERE id=?`
-  await db.doQuery(conn, query, [req.cookies.csrf_token, payload.userId])
+  await db.doQuery(conn, query, ['', payload.userId])
 
   conn.end()
 
