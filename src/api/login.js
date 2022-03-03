@@ -20,6 +20,7 @@ export default async function handler(req, res) {
 
     let conn = await db.doConnect()
 
+
     ////////////
     // Proper way to check authentication
     // Comment this code block to try the SQL injection below
@@ -47,6 +48,7 @@ export default async function handler(req, res) {
     }
     ////////////
 
+
     /*
     ////////////
     // Bad authentication with SQL injection
@@ -55,7 +57,7 @@ export default async function handler(req, res) {
     
     const password_hash = await password.hash(req.body.password)
 
-    query = `SELECT * FROM users WHERE username='${req.body.username}' AND password='${password_hash}'`
+    let query = `SELECT * FROM users WHERE username='${req.body.username}' AND password='${password_hash}'`
     console.log(query)
     let user  = await db.doQuery(conn, query)
     user = user[0]
