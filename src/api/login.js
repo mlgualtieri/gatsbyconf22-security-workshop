@@ -1,8 +1,8 @@
 // npm install jsonwebtoken
 import * as jwt from "jsonwebtoken"
-
 const crypto = require("crypto")
-
+import * as db from "../services/mysql"
+import * as password from "../services/password"
 export default async function handler(req, res) {
   console.log(`login form`, req.body)
   try {
@@ -18,9 +18,7 @@ export default async function handler(req, res) {
 
     // Log in to database and check credentials
 
-    const db = require("../services/mysql")
     let conn = await db.doConnect()
-
 
     ////////////
     // Proper way to check authentication
@@ -36,7 +34,6 @@ export default async function handler(req, res) {
     console.log(user)
 
     // Check if valid login
-    const password = require("../services/password")
 
     let loginResult
     try {
@@ -50,16 +47,15 @@ export default async function handler(req, res) {
     }
     ////////////
 
-
     /*
     ////////////
     // Bad authentication with SQL injection
     // Comment the above codeblock and uncomment this to try the SQL injection
     let loginResult = false
-    var password = require('../services/password');
-    var password_hash = await password.hash(req.body.password)
+    
+    const password_hash = await password.hash(req.body.password)
 
-    var query = `SELECT * FROM users WHERE username='${req.body.username}' AND password='${password_hash}'`
+    query = `SELECT * FROM users WHERE username='${req.body.username}' AND password='${password_hash}'`
     console.log(query)
     let user  = await db.doQuery(conn, query)
     user = user[0]
@@ -69,7 +65,6 @@ export default async function handler(req, res) {
     }
     ////////////
     */
-
 
     if (loginResult === true) {
       console.log("Good login")
@@ -132,4 +127,3 @@ export default async function handler(req, res) {
     console.log(err)
   }
 }
-

@@ -10,7 +10,6 @@ export const getUser = () =>
     : {}
 
 export const handleLogin = async data => {
-
   await fetch(`/api/login`, {
     method: `POST`,
     body: JSON.stringify(data),
@@ -27,8 +26,8 @@ export const handleLogin = async data => {
       } else {
         // Put our CSRF token into local storage
         // This is the value we will trust, and no longer use the cookie
-        const cookies = new Cookies();
-        window.localStorage.setItem("csrf_token", cookies.get('csrf_token'))
+        const cookies = new Cookies()
+        window.localStorage.setItem("csrf_token", cookies.get("csrf_token"))
 
         // redirect to dashboard
         navigate(`/app/dashboard`)
@@ -46,9 +45,9 @@ export const handleLogin = async data => {
       } else {
         // Put our CSRF token into local storage
         // This is the value we will trust, and no longer use the cookie
-        const cookies = new Cookies();
-        window.localStorage.setItem("csrf_token", cookies.get('csrf_token'))
-        alert(cookies.get('csrf_token'))
+        const cookies = new Cookies()
+        window.localStorage.setItem("csrf_token", cookies.get("csrf_token"))
+        alert(cookies.get("csrf_token"))
 
         // redirect to dashboard
         window.location.href = `/app/dashboard`
@@ -67,8 +66,7 @@ export const isLoggedIn = () => {
   return !!token
 }
 
-
-export const logout = () => {
+export const logout = async () => {
   // remove cached data regardless of session status
   window.localStorage.removeItem("dataCache")
   window.localStorage.removeItem("csrf_token")
@@ -76,9 +74,9 @@ export const logout = () => {
   if (isLoggedIn()) {
     // If logged in then logout via the backend API
     console.log("logging out...")
-    fetch(`/api/logout`).then(() => (window.location.href = "/app/login"))
+    await fetch(`/api/logout`).then(() => (window.location.href = "/app/login"))
   } else {
     // Make sure we always redirect on logout
-    window.location.href = "/app/login"
+    navigate("/app/login")
   }
 }
