@@ -23,9 +23,7 @@ The workshop will cover the following topics:
 
 
 ## To try out the application run:
-    ```shell
     cd gatsbyconf22-security-workshop/
     npm install
     gatsby develop
-    ```
 Note: For the application to be fully functional it requires an AWS RDS MySQL server and an AWS S3 bucket, accessible via an IAM user.
