@@ -103,9 +103,8 @@ export default async function handler(req,res) {
 			// Send file
 			res.setHeader('Content-Type', data.ContentType);
 			res.setHeader('Content-Length', data.ContentLength);
-			res.setHeader('Content-Disposition', `'attachment; filename="${req.query.file}"'`);
+			res.setHeader('Content-Disposition', `attachment; filename="${req.query.file}"`);
 			res.status(200).send(data.Body)
-
 		}     
 	});
 
