@@ -12,5 +12,19 @@ module.exports = {
         "gatsby-plugin-sharp",
         "gatsby-plugin-mdx",
         "gatsby-transformer-sharp",
+        {
+          resolve: `gatsby-plugin-gatsby-cloud`,
+          options: {
+            mergeSecurityHeaders: false,
+            headers: {
+              "/*": [
+                  "X-Frame-Options: DENY",
+                  "X-XSS-Protection: 1; mode=block",
+                  "X-Content-Type-Options: nosniff",
+                  "Referrer-Policy: same-origin",
+              ],
+            },
+          },
+        },
     ]
 }
