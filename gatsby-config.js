@@ -18,11 +18,11 @@ module.exports = {
             mergeSecurityHeaders: false,
             headers: {
               "/*": [
-                  "X-Frame-Options: DENY",
-                  "X-XSS-Protection: 1; mode=block",
-                  "X-Content-Type-Options: nosniff",
-                  "Referrer-Policy: same-origin",
-                  `Content-Security-Policy: content="default-src 'self'"`
+                  `X-Frame-Options: DENY`,
+                  `X-XSS-Protection: 1; mode=block`,
+                  `X-Content-Type-Options: nosniff`,
+                  `Referrer-Policy: same-origin`,
+                  `Content-Security-Policy: upgrade-insecure-requests; default-src 'self'; `
               ],
             },
           },
