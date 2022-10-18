@@ -65,7 +65,6 @@ if(isLoggedIn()) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:300,400" />
 
         <script type="text/javascript" src="https://www.mike-gualtieri.com/js/demo.js" crossorigin="anonymous"></script>
-
       </Helmet>
       <NavBar />
       <main>
