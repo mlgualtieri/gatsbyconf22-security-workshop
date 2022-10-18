@@ -22,7 +22,7 @@ module.exports = {
                   `X-XSS-Protection: 1; mode=block`,
                   `X-Content-Type-Options: nosniff`,
                   `Referrer-Policy: same-origin`,
-                  `Content-Security-Policy: upgrade-insecure-requests; default-src 'self'; `
+                  //`Content-Security-Policy: upgrade-insecure-requests; default-src 'self'; `
               ],
             },
           },
