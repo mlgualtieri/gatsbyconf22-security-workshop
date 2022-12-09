@@ -6,7 +6,7 @@ module.exports = {
     siteMetadata: {
       title: `GatsbyConf 2022 Security Workshop`,
       siteUrl: `https://www.yourdomain.tld`,
-      description: `<img src="/blah" onerror="alert(1)" />`,
+      description: `<h4>tester</h4>`,
     },
     plugins: [
         "gatsby-plugin-image",
