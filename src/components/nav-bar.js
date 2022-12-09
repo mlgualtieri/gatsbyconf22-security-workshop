@@ -19,6 +19,8 @@ export default function NavBar() {
     >
       <span>{greetingMessage}</span>
       <nav>
+        <Link to="https://google.com"><i className="fa fa-home"></i> google</Link>
+        <Link to="//google.com"><i className="fa fa-home"></i> google2</Link>
         <Link to="/"><i className="fa fa-home"></i> home</Link>
         {` `}
         {!isLoggedIn() ? ( // TODO: use one ternary to dictate which flow is used here

@@ -3,6 +3,7 @@ import Layout from '../components/layout'
 import { Link } from "gatsby"
 import { isLoggedIn } from "../services/auth"
 import gatsbyLogo from '../images/Gatsby-Logo.svg'
+import { graphql } from 'gatsby'
 
 const IndexPage = () => {
   return (
@@ -12,7 +13,7 @@ const IndexPage = () => {
         <img
           className="img100"
           alt="GatsbyConf 2022 Security Demo"
-          src={gatsbyLogo}
+          src={gatsbyLogo2}
         />
       </div>
 
@@ -36,4 +37,15 @@ const IndexPage = () => {
     </Layout>
   )
 }
+
+
+export const query = graphql`
+  query HomePageQuery {
+    site {
+      siteMetadata {
+        description
+      }
+    }
+  }
+`
 export default IndexPage
